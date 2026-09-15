@@ -2,6 +2,9 @@
 
 Base population/signal model: 1.0 · 14 September 2026
 
+The 1.3 shared live-data field and measured wind spectrum are documented in
+[LIVE.md](LIVE.md); local temperature is documented in [WEATHER.md](WEATHER.md).
+
 The live strain/SDF gauge, AC/DC multimeter, and virtual FMCW/Doppler instruments
 added in 1.2 are defined in [INSTRUMENTS.md](INSTRUMENTS.md). The sections below
 document the underlying population interpolation, synthetic trace generator,

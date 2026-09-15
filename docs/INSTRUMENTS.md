@@ -1,5 +1,9 @@
 # ZERO instrument model
 
+The default shared field uses measured NOAA wind for its AC/DC and Fourier
+readings; see [LIVE.md](LIVE.md). The synthetic waveform and virtual radar below
+remain available in the collapsed **Instrument definitions & controls** section.
+
 The counter updates continuously from a population model. Its last digits are a
 clock presentation, not individually measured people. The Census Bureau derives
 the world clock from country estimates and projections; revisions can change the
