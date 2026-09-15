@@ -1,0 +1,24 @@
+node_modules/
+__pycache__/
+*.pyc
+dist/
+build/
+coverage/
+test-results/
+playwright-report/
+
+# Local settings, credentials, and generated reports never belong in source control.
+.env
+.env.*
+!.env.example
+*.log
+*.local
+desktop-settings.json
+zero-snapshot-*.json
+
+# Editor and operating-system metadata.
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
