@@ -1,6 +1,6 @@
 # Verification record
 
-ZERO 1.2.0 · 15 September 2026 · Windows x64 · Electron 44.3.0
+ZERO 1.3.0 · 15 September 2026 · Windows x64 · Electron 44.3.0
 
 ## Reproduce
 
@@ -12,17 +12,22 @@ npm run package:windows
 npm run test:desktop
 ```
 
-The 70 Node tests cover population anchors and interpolation, timer recovery and
+The 90 Node tests cover population anchors and interpolation, timer recovery and
 completion accounting, exact energy integration, FFT calibration, signed distance,
 quarter-bridge polarity and inverse, phase/winding, Bayer thresholds, radar
-range/Doppler/aliasing, and NOAA live/cache validation. All pass.
+range/Doppler/aliasing, NOAA live/cache validation, weather units and cached
+timestamps, and Fourier analysis of contiguous minute-sampled wind data. Gaps,
+invalid latest samples, constant readings and actual zero values are covered.
+All pass.
 
-The 28 real packaged Electron checks use a separate temporary profile. They cover:
+The 31 real packaged Electron checks use a separate temporary profile. They cover:
 
 - Sandboxed renderer, native topmost state and recovery, and explicit unpinning.
-- Compact population-first layout and live counting while the timer is paused.
+- Compact 280 × 294 layout and live counting while the timer is paused.
+- Unified canvas, actual wind units, IJburg temperature and weather source details.
 - Timer progress, energy, tray hiding/pausing, and single-instance activation.
-- Expanded Fourier display, AC/DC coupling, tare and signed probe controls.
+- Expanded unified field with optional controls collapsed; AC/DC coupling, tare
+  and signed probe controls in the model-study section.
 - Virtual radar range and signed velocity; frozen art with a live population.
 - Bayer atlas, observation timestamps, settings and interval controls.
 - Saved timer, window position and pin preference after relaunch.
@@ -41,6 +46,10 @@ helper and accepted by its validators. Tests use fixed samples so an upstream
 outage cannot produce a false model-test failure. The app retains valid partial
 channels and labels missing or stale observations. A feed fetch is a network
 integration check, not validation of the spacecraft's physical measurements.
+
+The real NOAA history produced a valid 64-sample transform. The weather helper
+also retrieved and validated the actual Open-Meteo current temperature for the
+IJburg area. Neither successful fetch is treated as independent sensor validation.
 
 The installer verifies that the installed executable remains running and that
 unrelated current-user startup entries retain their values. The installed app's

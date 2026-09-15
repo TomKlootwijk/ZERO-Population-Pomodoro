@@ -1,6 +1,6 @@
 # Windows desktop guide
 
-ZERO 1.2 is an Electron desktop app with an editable HTML/CSS/JavaScript interface.
+ZERO 1.3 is an Electron desktop app with an editable HTML/CSS/JavaScript interface.
 The Windows package includes its runtime; installed users do not need Node.js.
 
 ## Build and install

@@ -2,40 +2,62 @@
 
 **A live population observatory for your desktop.**
 
-ZERO 1.2 puts a continuously ticking global population estimate at the center of
-an instrument panel: signed distance and strain, AC/DC signal statistics, a
-Fourier spectrum, and a virtual FMCW/Doppler radar. A compact Pomodoro timer stays
-available underneath. Expand the panel to explore the instruments.
+ZERO 1.3 brings the population clock, received NOAA observations, and **IJburg
+temperature** into one shared visual field. Its main **DC, AC RMS, and Fourier
+readings come from actual NOAA wind-speed samples**. Population contours, Bayer
+dots, the waveform, and the spectrum share the same canvas, with a Pomodoro timer
+underneath.
 
-![ZERO compact population clock](docs/preview-compact.png)
+The default compact widget is approximately **280 × 293 pixels**. Expand it for
+channel values, source timestamps, the selected FFT window, and a visual legend.
 
-![Expanded signal instruments](docs/preview-expanded.png)
+![Compact ZERO with the shared live field and IJburg temperature](docs/preview-compact.png)
+
+![Expanded ZERO with live wind statistics and source details](docs/preview-expanded.png)
 
 The Windows app stays **always on top**, starts at **Windows sign-in**, and lives
 in the system tray. Drag its header to move it; double-click to dock it at the
 bottom right. Pin and startup preferences can be changed in Settings or the tray.
 
-## What the instruments mean
+## One field, identifiable data
 
-| Instrument | Meaning |
+| Visual or reading | Source and meaning |
 | --- | --- |
 | Population clock | U.S. Census Bureau world estimate, interpolated between published time anchors. |
-| Signed distance / strain | Distance along the population count axis and change in parts per million from your saved reference. |
-| Quarter bridge | A virtual bridge-voltage analogy derived from population strain. |
-| AC/DC multimeter and FFT | Statistics and frequency analysis of a synthetic signal around the population baseline. |
-| FMCW / Doppler | A virtual radar simulation with user-set range and velocity, modeled chirps, and beat frequencies. |
-| Earth / space Bayer atlas | Live NOAA solar-wind speed, density, temperature and interplanetary Bz, mapped into four ordered-dither rings. |
-| Power, current, energy | Hypothetical values using adjustable watts per person and voltage. |
+| Bayer dots / magnetic marker | Reported NOAA solar-wind speed, density, temperature, and signed interplanetary Bz observations. |
+| Cyan waveform / DC / AC RMS | Received wind speed and its fluctuations around the selected window's mean, in km/s. |
+| Amber Fourier arc / peak | Amplitude spectrum of those wind-speed samples; peak frequency in millihertz (mHz). |
+| Contours / strain / quarter bridge | Modeled population change from your saved reference, with a virtual bridge-voltage analogy. |
+| Thermal glow / IJburg strip | Open-Meteo weather-model temperature at 2 m for IJburg, Amsterdam, in °C. |
+| Sweep | Display phase marking time. |
 
-The clock is an estimate, not an individual-by-individual live census. Its source
-date and offline/extrapolation status are visible. The other instruments do not
-measure people, EEG, radio signals, or global electricity use. No microphone,
-radar, or other sensor is accessed. See [instrument equations](docs/INSTRUMENTS.md)
-and the [population, energy, and timer model](docs/MODEL.md). The Earth / space
-panel uses measured NOAA data with separate timestamps, freshness indicators and
-derived proton dynamic pressure. Read the [telemetry mapping](docs/TELEMETRY.md).
+The app retains source values and observation timestamps. The graphics use
+defined visual scales; combining channels does not imply a physical or causal
+connection between them. The population remains a model, and local weather
+remains model-based. NOAA supplies spacecraft measurements; ZERO accesses no
+local microphone or radar hardware.
 
-![Live NOAA Bayer atlas](docs/preview-earth-space.png)
+The main FFT needs **16, 32, or 64 consecutive one-minute wind samples**. Missing
+minutes are never interpolated or replaced with synthetic values. A short or
+interrupted latest window shows a waiting reason. See the
+[live signal definitions](docs/LIVE.md), [NOAA data handling](docs/TELEMETRY.md),
+and [IJburg weather details](docs/WEATHER.md).
+
+Source updates use **periodic polling**:
+
+| Channel | Source timing | Automatic fetch interval |
+| --- | --- | --- |
+| Population | Continuously interpolated source model | On launch and every 6 hours |
+| NOAA wind / magnetic data | One-minute observations | Every 5 minutes |
+| IJburg current weather | 15-minute model data | Every 15 minutes |
+
+Fetching again does not create a new observation. Timestamps and saved/stale
+states identify the data being shown.
+
+The collapsed **Instrument definitions & controls** section retains optional
+synthetic waveform, virtual FMCW/Doppler, and hypothetical power/energy studies.
+Their assumptions are described in the [instrument equations](docs/INSTRUMENTS.md)
+and [population, energy, and timer model](docs/MODEL.md).
 
 ## Windows installation
 
@@ -98,7 +120,7 @@ Automatic startup installation is provided for Windows.
 
 | Control | Action |
 | --- | --- |
-| M / expand icon | Switch compact and expanded instruments |
+| M / expand icon | Switch compact and expanded views of the shared field |
 | S / settings | Open preferences |
 | Space | Start or pause the timer |
 | R | Reset the current interval |
@@ -117,9 +139,8 @@ saves a model report; it is not a restorable settings backup. Use one browser ta
 per local origin to avoid competing saves. The desktop host uses a single instance.
 There are no accounts, analytics, or advertising.
 
-Earth / space refreshes from NOAA every five minutes when enabled. Its last valid
-observations are cached locally; unavailable channels remain visibly missing or
-stale. Freeze stops instrument animation while the population and timer continue.
+The last valid NOAA and weather observations are cached locally. Unavailable
+channels stay visibly missing or stale; a failed fetch adds no invented readings.
 
 ## Development and builds
 
