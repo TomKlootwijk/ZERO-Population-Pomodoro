@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://www.census.gov https://services.swpc.noaa.gov; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>ZERO — world in motion</title>
+  <link rel="icon" href="web/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="web/style.css">
+  <link rel="stylesheet" href="web/telemetry.css">
+  <script src="web/seed.js" defer></script>
+  <script src="web/core.js" defer></script>
+  <script src="web/instruments.js" defer></script>
+  <script src="web/instrument-view.js" defer></script>
+  <script src="web/telemetry.js" defer></script>
+  <script src="web/telemetry-view.js" defer></script>
+  <script src="web/app.js" defer></script>
+</head>
+<body>
+  <div class="browser-intro" id="intro">
+    <div class="wordmark">Z E R O <span> / 01</span></div>
+    <p class="eyebrow">A POCKET POPULATION OBSERVATORY</p>
+    <h1>Eight billion.<br>Still counting.</h1>
+    <p class="intro-copy">The world, expressed in numbers, fields, and frequencies.<br>A live estimate with an instrument lab underneath.</p>
+    <div class="intro-instructions">
+      <p><kbd>Space</kbd> start / pause <span>·</span> <kbd>M</kbd> compact <span>·</span> <kbd>S</kbd> settings</p>
+      <p id="launchHint">Run the desktop version for an always-on-top observatory.</p>
+    </div>
+    <p class="intro-note">A live estimate. A synthetic signal. A virtual radar.<br>Real mathematics. Transparent assumptions.</p>
+  </div>
+
+  <div id="widgetHome">
+  <section class="widget" id="widget" aria-label="ZERO live population observatory">
+    <svg class="svg-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="i-settings" viewBox="0 0 24 24"><path d="m9 3-.7 3-2.8 1-2.5-.4-1 3 2 1.8v3L2 16l1.5 2.6 2.5-.5 2.5 1.5.5 2.4h3l1-2.4 2.5-1.5 2.5.5 1.5-2.6-1.5-1.8v-3l2-1.8-1-3-2.5.4-2.8-1L15 3Z"/><circle cx="11" cy="12" r="3"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="m8 3 8 0-1 7 4 4v2H5v-2l4-4-1-7Zm4 13v6"/></symbol>
+      <symbol id="i-float" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M13 14h5v3h-5zM7 8h5M7 11h3"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+      <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></symbol>
+      <symbol id="i-skip" viewBox="0 0 24 24"><path d="m5 5 10 7-10 7V5Zm13 0v14"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></symbol>
+    </svg>
+    <header class="widget-header" id="dragHandle">
+      <div class="brand"><span class="brand-symbol" aria-hidden="true">∅</span><span>ZERO</span><span class="brand-divider">/</span><span class="brand-sub">WORLD IN MOTION</span></div>
+      <div class="window-tools">
+        <button class="icon-button" id="floatButton" aria-label="Float above other apps" title="Float above other apps"><svg><use href="#i-float"/></svg></button>
+        <button class="icon-button" id="compactButton" aria-label="Toggle compact view" title="Compact view (M)" aria-pressed="false"><svg><use href="#i-minus"/></svg></button>
+        <button class="icon-button" id="settingsButton" aria-label="Settings" title="Settings (S)" aria-expanded="false"><svg><use href="#i-settings"/></svg></button>
+        <button class="icon-button native-only" id="closeButton" aria-label="Hide ZERO to tray" title="Hide to tray · timer keeps running"><svg><use href="#i-close"/></svg></button>
+      </div>
+    </header>
+    <main class="widget-main" id="mainPanel">
+      <section class="population-section" aria-label="Estimated global population">
+        <div class="section-heading"><span>GLOBAL POPULATION / P(t)</span><span class="live-tag"><i></i> LIVE ESTIMATE</span></div>
+        <div class="population-count" id="population" aria-live="off">—</div>
+        <div class="population-sub"><span id="growth">— people / sec</span><span>U.S. Census · world</span></div>
+        <div class="population-metrics">
+          <div><span>NET TODAY · UTC</span><strong id="netToday">—</strong></div>
+          <div><span>SINCE TARE</span><strong id="populationDrift">—</strong></div>
+          <div class="expanded-only"><span>TO NEXT MILLION</span><strong id="nextMillionEta">—</strong></div>
+        </div>
+      </section>
+      <section class="strain-section" aria-label="Population signed distance and relative strain">
+        <div class="section-heading"><span>01 / SIGNED DISTANCE FIELD</span><button class="micro-button" id="tareButton" title="Lock a new population reference and return the probe to zero">ZERO / TARE</button></div>
+        <div class="strain-readout"><div><span class="metric-label">φ = n − P(t)</span><strong id="distanceValue">+0.0 <small>people</small></strong></div><div class="strain-ppm"><span class="metric-label">RELATIVE GROWTH · ΔP/P₀</span><strong id="strainValue">+0.000 <small>ppm</small></strong></div></div>
+        <div class="gauge-wrap"><canvas id="strainGauge" role="img" aria-label="One-dimensional signed distance gauge, negative below the population estimate and positive above"></canvas></div>
+        <div class="gauge-legend"><span id="gaugeMin">−100</span><span>P(t) · ZERO SURFACE</span><span id="gaugeMax">+100 people</span></div>
+        <div class="probe-control expanded-only"><label for="probeInput">Probe offset from tare reference</label><output id="probeOutput" for="probeInput">+0 people</output><input id="probeInput" type="range" min="-500" max="500" value="0" step="1"><p class="instrument-note" id="referenceNote">Tare locks P₀. The population keeps moving past the probe.</p></div>
+      </section>
+      <div class="instrument-tabs expanded-only" role="tablist" aria-label="Instrument views">
+        <button id="signalTab" role="tab" aria-controls="signalPanel" aria-selected="true" data-instrument="signal">02 <span>SIGNAL / FFT</span></button>
+        <button id="radarTab" role="tab" aria-controls="radarPanel" aria-selected="false" tabindex="-1" data-instrument="radar">03 <span>FMCW RADAR</span></button>
+        <button id="telemetryTab" role="tab" aria-controls="telemetryPanel" aria-selected="false" tabindex="-1" data-instrument="telemetry">04 <span>EARTH / SPACE</span></button>
+        <button id="energyTab" role="tab" aria-controls="energyPanel" aria-selected="false" tabindex="-1" data-instrument="energy">05 <span>ENERGY</span></button>
+      </div>
+      <section class="signal-section instrument-panel" id="signalPanel" role="tabpanel" aria-labelledby="signalTab">
+        <div class="signal-header"><span><i class="signal-dot"></i> <span class="signal-title">OSCILLOSCOPE</span></span><div class="signal-switches"><div class="coupling-controls expanded-only" role="group" aria-label="Oscilloscope coupling"><button data-coupling="ac" class="active" aria-pressed="true" title="Remove the sample mean">AC</button><button data-coupling="dc" aria-pressed="false" title="Include the probe’s signed-distance offset">DC</button></div><span class="simulation-tag">SYNTHETIC</span></div></div>
+        <div class="trace-wrap"><canvas id="waveform" height="106" role="img" aria-label="Synthetic population deviation waveform in illustrative people"></canvas><span class="zero-label" id="scopeZero">0 <span>people</span></span><span class="trace-scale" id="traceScale">—</span></div>
+        <div class="scope-axis expanded-only"><span id="scopeMode">AC · mean removed</span><span>4 seconds / 128 samples·s⁻¹</span></div>
+        <div class="multimeter expanded-only" aria-label="Multimeter statistics of the synthetic signal"><div><span>DC / MEAN</span><strong id="meterDC">—</strong><small>people</small></div><div><span>AC / TRUE RMS</span><strong id="meterAC">—</strong><small>people</small></div><div><span>PEAK TO PEAK</span><strong id="meterPP">—</strong><small>people</small></div><div><span>DOMINANT</span><strong id="meterHz">—</strong><small>Hz</small></div></div>
+        <div class="spectrum-heading expanded-only"><span>AMPLITUDE SPECTRUM / FFT</span><span id="fftPeak">—</span></div>
+        <div class="spectrum-row expanded-only"><canvas id="spectrum" height="58" role="img" aria-label="Calculated Fourier amplitude spectrum of the synthetic AC trace"></canvas></div>
+        <div class="spectrum-axis expanded-only"><span>0</span><span>16</span><span>32</span><span>48</span><span>64 Hz</span></div>
+        <div class="trace-meta expanded-only"><span id="signalMeta">512-point FFT · Hann · 0.25 Hz/bin</span><button class="text-button" id="freezeButton" aria-pressed="false">Freeze signal</button></div>
+        <p class="instrument-note expanded-only">Illustrative people, no sensor input. DC adds φ to the synthetic trace; AC removes its mean. FFT amplitudes use a Hann window.</p>
+      </section>
+      <section class="radar-section instrument-panel expanded-only" id="radarPanel" role="tabpanel" aria-labelledby="radarTab" hidden>
+        <div class="signal-header"><span><i class="signal-dot radar-dot"></i> VIRTUAL FMCW / 77 GHz</span><span class="simulation-tag">SIMULATION</span></div>
+        <div class="radar-overview"><div class="radar-map-wrap"><canvas id="radarMap" role="img" aria-label="Virtual target range display, a simulation with one target"></canvas><span>VIRTUAL TARGET</span></div><div class="radar-readings"><div><span>RANGE</span><strong id="radarRange">42.0 <small>m</small></strong></div><div><span>DOPPLER SHIFT</span><strong id="radarDoppler">— <small>Hz</small></strong></div><div><span>DECHIRPED BEAT</span><strong id="radarBeat">— <small>kHz</small></strong></div></div></div>
+        <div class="radar-controls"><label>Target range <output id="rangeOutput" for="radarRangeInput">42 m</output><input id="radarRangeInput" type="range" min="1" max="150" value="42" step="1"></label><label>Radial speed <output id="speedOutput" for="radarSpeedInput">+1.5 m/s</output><input id="radarSpeedInput" type="range" min="-20" max="20" value="1.5" step="0.1"></label></div>
+        <div class="radar-plot-heading"><span>CHIRP FREQUENCY / NORMALIZED SWEEP</span><span><b class="tx-key">TX</b> <b class="rx-key">RX</b></span></div>
+        <div class="radar-plot"><canvas id="radarChirp" role="img" aria-label="Transmitted and delayed received chirp instantaneous frequency ramps, not radio-frequency voltage"></canvas></div>
+        <div class="radar-plot-heading"><span>MODELED IF / NORMALIZED AMPLITUDE</span><span id="radarWindow">—</span></div>
+        <div class="radar-plot radar-if"><canvas id="radarIF" role="img" aria-label="Synthetic intermediate-frequency beat waveform after dechirping"></canvas></div>
+        <div class="trace-meta"><span id="radarResolution">150 MHz sweep · 1 ms chirp · — m resolution</span><button class="text-button" id="radarFreezeButton" aria-pressed="false">Freeze signal</button></div>
+        <p class="instrument-note">One ideal target · log-radius map, cosmetic scan phase. Positive speed approaches. fᵦ = 2SR/c − 2v/λ. The range–Doppler coupling is deliberate. No RF hardware or person sensing.</p>
+      </section>
+      <section id="telemetryPanel" class="instrument-panel expanded-only" role="tabpanel" aria-labelledby="telemetryTab" hidden><div id="telemetryMount"></div></section>
+      <section class="energy-section instrument-panel expanded-only" id="energyPanel" role="tabpanel" aria-labelledby="energyTab" hidden>
+        <div class="signal-header"><span>POPULATION × ENERGY</span><span class="simulation-tag">HYPOTHETICAL</span></div>
+        <div class="energy-grid"><div><span class="metric-label">Equivalent power</span><strong id="power">—</strong></div><div><span class="metric-label">Equivalent current</span><strong id="current">—</strong></div><div><span class="metric-label" id="energyLabel">Focus interval energy</span><strong id="energy">0.00 J</strong></div></div>
+        <p class="assumptions" id="assumptions">100 W/person · 230 V equivalent · adjustable</p>
+        <div class="energy-formula">P(t) × watts/person <span>=</span> watts<br>watts ÷ voltage <span>=</span> equivalent amperes<br>∫ power · dt <span>=</span> interval joules</div>
+        <p class="instrument-note">An editable thought experiment. No real global circuit, measured electricity use, or harvestable energy is implied. Joules accrue only while the focus or break timer runs.</p>
+        <button id="energySettingsButton" class="secondary-button full-width">Edit energy assumptions</button>
+      </section>
+      <section class="pomodoro-section" aria-label="Pomodoro timer">
+        <div class="timer-heading"><span id="phaseLabel">FOCUS</span><span class="timer-status" id="timerStatus">Ready</span></div>
+        <div class="mode-tabs" role="group" aria-label="Timer mode">
+          <button data-mode="focus" class="active" aria-pressed="true">Focus</button>
+          <button data-mode="short" aria-pressed="false">Short break</button>
+          <button data-mode="long" aria-pressed="false">Long break</button>
+        </div>
+        <div class="timer-row">
+          <div><div class="timer" id="timer" role="timer" aria-live="off" aria-label="25 minutes remaining">25:00</div><div class="timer-caption" id="timerCaption">One small moment of focus.</div></div>
+          <div class="session-progress"><div class="orbit" id="orbit"><span id="sessionCount">01</span></div><span id="sessionLabel">0 COMPLETE</span></div>
+        </div>
+        <div class="timer-progress" id="timerProgress" role="progressbar" aria-label="Current interval progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+        <div class="timer-controls">
+          <button class="primary-button" id="startButton" title="Start or pause (Space)"><svg><use href="#i-play"/></svg><span id="startText">Start focus</span></button>
+          <button class="square-button" id="resetButton" aria-label="Reset current timer" title="Reset current timer (R)"><svg><use href="#i-reset"/></svg></button>
+          <button class="square-button" id="skipButton" aria-label="Skip to next interval" title="Next interval (N)"><svg><use href="#i-skip"/></svg></button>
+        </div>
+      </section>
+    </main>
+    <footer class="widget-footer"><button id="sourceButton" class="source-button" title="Data source and model notes"><i id="sourceDot"></i><span id="sourceStatus">Bundled estimate</span></button><button id="aboutButton" class="footer-about" title="Model and source notes" aria-label="Model and source notes">MODEL <svg><use href="#i-info"/></svg></button></footer>
+
+    <section class="drawer" id="settingsPanel" aria-labelledby="settingsTitle" hidden>
+      <div class="drawer-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h2 id="settingsTitle">Tune your observatory.</h2></div><button class="icon-button drawer-close" aria-label="Close settings"><svg><use href="#i-close"/></svg></button></div>
+      <form id="settingsForm">
+        <fieldset class="desktop-settings" id="desktopSettings" hidden><legend>Desktop</legend><div class="switch-list">
+          <label><span>Always on top</span><input id="pinnedInput" type="checkbox" role="switch" checked></label>
+          <label id="launchAtLoginOption" hidden><span>Start with Windows</span><input id="launchAtLoginInput" type="checkbox" role="switch"></label>
+        </div><p class="field-note">Applies immediately. The × button hides ZERO in the system tray; your timer keeps running.</p></fieldset>
+        <fieldset><legend>Focus rhythm</legend><div class="form-grid three">
+          <label>Focus · min<input name="focusMinutes" type="number" min="1" max="180" step="1" required></label>
+          <label>Short · min<input name="shortMinutes" type="number" min="1" max="60" step="1" required></label>
+          <label>Long · min<input name="longMinutes" type="number" min="1" max="120" step="1" required></label>
+        </div><label class="inline-field">Long break every<input name="longEvery" type="number" min="1" max="12" step="1" required><span>completed focuses</span></label></fieldset>
+        <fieldset><legend>Hypothetical electrical equivalent</legend><div class="form-grid">
+          <label>Watts per person<input name="wattsPerPerson" type="number" min="0" max="100000" step="0.1" required></label>
+          <label>Equivalent voltage · V<input name="voltage" type="number" min="0.1" max="1000000" step="0.1" required></label>
+        </div><p class="field-note">Illustrative defaults, not global measurements. A voltage assumption is required to calculate amperes. No real global circuit is implied.</p></fieldset>
+        <fieldset><legend>Synthetic signal</legend><label>Base excursion · illustrative people<input name="gain" type="range" min="1" max="200" step="1"><output id="gainOutput">24</output></label><p class="field-note">Scaled by estimated net growth. It never changes the population count or represents uncertainty.</p></fieldset>
+        <div class="switch-list">
+          <label><span>Completion chime</span><input name="sound" type="checkbox" role="switch"></label>
+          <label><span>Animate virtual instruments</span><input name="motion" type="checkbox" role="switch"></label>
+          <label><span>Refresh Census feed every 6 hours</span><input name="autoRefresh" type="checkbox" role="switch"></label>
+        </div>
+        <p class="field-note">Timer lengths apply to the next new interval. Settings stay on this device.</p>
+        <button class="primary-button save-button" type="submit">Save settings</button>
+      </form>
+      <button class="text-button quit-button" id="quitButton" hidden>Quit ZERO</button>
+    </section>
+
+    <section class="drawer" id="aboutPanel" aria-labelledby="aboutTitle" hidden>
+      <div class="drawer-heading"><div><p class="eyebrow">UNDER THE SURFACE</p><h2 id="aboutTitle">Models, with the maths visible.</h2></div><button class="icon-button drawer-close" aria-label="Close model notes"><svg><use href="#i-close"/></svg></button></div>
+      <div class="model-notes">
+        <h3>01 / Population & census</h3><p>The count is a continuously interpolated <b>U.S. Census Bureau world estimate</b>, not a real-time enumeration. It can differ from UN estimates. Network refreshes do not count individual births or deaths.</p>
+        <div class="source-detail" id="sourceDetail">Loading source details…</div>
+        <div class="source-actions"><button id="refreshButton" class="secondary-button">Refresh feed</button><button id="importButton" class="secondary-button">Import JSON</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
+        <p class="field-note" id="networkMessage">A bundled 14 Sep 2026 snapshot keeps the estimate running offline.</p>
+        <h3>02 / Signed distance & relative strain</h3><p><code>φ(n,t) = n − P(t)<br>n = P₀ + probe offset<br>relative strain = (P(t) − P₀) / P₀ × 10⁶ ppm</code></p><p>The gauge is a one-dimensional signed distance in people, centered on the estimated total P(t). Tare locks a reference P₀, so an unchanged probe drifts negative as population grows. Strain is a mathematical relative change, not measured physical strain. The signed field is not a geographic or three-dimensional surface.</p><p><code>x = 2 × relative strain<br>Vout / Vex = −x / (4 + 2x) · Vex = 5 V</code></p><p>A virtual quarter bridge maps that relative change to an illustrative voltage, with gauge factor 2 and an R4-arm sign convention. No strain sensor is connected. Tare is a local reference only; changing the source can shift the gauge.</p><h3>03 / Oscilloscope & spectrum</h3><p>A seeded spectrum is inverse-transformed into illustrative population deviations. One 16-second cycle repeats. The multimeter computes the mean, AC RMS, and peak-to-peak of the four-second sample window. DC coupling includes φ; AC coupling subtracts the sample mean. The real 512-point FFT uses a Hann window with coherent-gain correction at 128 samples per second. <b>No demographic variability, EEG, or electrical signal is measured.</b></p><h3>04 / Virtual FMCW radar</h3><p><code>delay = 2R/c · S = bandwidth / chirp time<br>Doppler = 2v/λ<br>beat = S × delay − Doppler</code></p><p>A single ideal target with no noise or multipath. Positive velocity approaches. Tx and Rx show normalized instantaneous chirp frequency; IF is a computed beat waveform. Range and speed are independent of world population. A single up-chirp has range–Doppler coupling; the beat alone cannot independently determine both. The simulation uses no transmitting or receiving hardware.</p>
+        <h3>05 / Earth & space</h3><p>Solar-wind and magnetic readings come from NOAA SWPC upstream spacecraft feeds. Observation timestamps, freshness, and data alignment stay visible in the Earth / Space panel. An 8 × 8 Bayer matrix turns each received value into an ordered dot density. The scanning line is decorative; the dots change only when observations update. These readings do not imply a relationship with population.</p><h3>06 / Joules, watts & amperes</h3><p><code>W(t) = P(t) × w/person</code><br><code>I(t) = W(t) / V</code><br><code>E = ∫ W(t) dt</code></p><p>Session joules integrate the model only while the current timer is running, capped at its deadline. Pauses add nothing. The initial <b>100 W/person</b> and <b>230 V</b> are editable illustrative assumptions, not measured physiology, electricity consumption, or harvestable human energy.</p>
+        <h3>Sources & transparency</h3><p class="source-links"><a href="https://www.census.gov/popclock/world" target="_blank" rel="noopener noreferrer">Census world clock ↗</a><a href="https://www.census.gov/popclock/data/population.php/world" target="_blank" rel="noopener noreferrer">Official JSON feed ↗</a><a href="https://www.nist.gov/pml/owm/si-units-electric-current" target="_blank" rel="noopener noreferrer">NIST electrical units ↗</a><a href="https://www.spaceweather.gov/products/solar-wind" target="_blank" rel="noopener noreferrer">NOAA solar wind ↗</a></p><p>No telemetry, ads, accounts, microphone, EEG input, or personal population data. Only public Census and NOAA SWPC feeds are contacted automatically when their refresh options are enabled.</p>
+        <button id="exportButton" class="secondary-button full-width">Export current model snapshot</button>
+        <p class="field-note">Space: start/pause · R: reset · N: next · M: compact · S: settings · Esc: close panel. Resets and skipped intervals do not count as completed focuses.</p>
+      </div>
+    </section>
+    <div class="toast" id="toast" role="status" hidden></div>
+    <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
+  </section>
+  </div>
+  <noscript>This widget requires JavaScript. Enable it in your browser, then reopen index.html.</noscript>
+</body>
+</html>

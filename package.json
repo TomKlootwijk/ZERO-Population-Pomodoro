@@ -1,0 +1,27 @@
+{
+  "name": "zero-population-focus",
+  "version": "1.2.0",
+  "productName": "ZERO",
+  "description": "Live population observatory with signed distance, strain, AC/DC Fourier instruments, virtual FMCW radar, and a focus timer.",
+  "private": true,
+  "main": "desktop/main.cjs",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "postinstall": "node node_modules/electron/install.js",
+    "start": "electron .",
+    "package:windows": "node scripts/package-windows.cjs",
+    "test:desktop": "node tests/desktop_smoke.cjs",
+    "start:x11": "electron --ozone-platform=x11 .",
+    "test": "node --test tests/core.test.cjs tests/instruments.test.cjs tests/telemetry.test.cjs",
+    "check": "node --check web/core.js && node --check web/instruments.js && node --check web/instrument-view.js && node --check web/telemetry.js && node --check web/telemetry-view.js && node --check web/app.js && node --check desktop/main.cjs && node --check desktop/preload.cjs && node --check desktop/window-bounds.cjs && node --check desktop/space-weather.cjs && node --check scripts/package-windows.cjs"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "electron": "^44.3.0",
+    "playwright": "^1.63.0",
+    "rcedit": "^5.0.2"
+  }
+}
