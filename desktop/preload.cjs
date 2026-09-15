@@ -9,6 +9,7 @@ function subscribe(channel, callback) {
 contextBridge.exposeInMainWorld('zeroDesktop', Object.freeze({
   fetchPopulation: () => ipcRenderer.invoke('zero:population'),
   fetchSpaceWeather: () => ipcRenderer.invoke('zero:space-weather'),
+  fetchWeather: () => ipcRenderer.invoke('zero:weather'),
   getDesktopState: () => ipcRenderer.invoke('zero:state'),
   setPinned: enabled => ipcRenderer.invoke('zero:pin', enabled),
   setLaunchAtLogin: enabled => ipcRenderer.invoke('zero:startup', enabled),

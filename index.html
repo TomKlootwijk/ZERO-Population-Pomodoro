@@ -4,17 +4,22 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://www.census.gov https://services.swpc.noaa.gov; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://www.census.gov https://services.swpc.noaa.gov https://api.open-meteo.com; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>ZERO — world in motion</title>
   <link rel="icon" href="web/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="web/style.css">
   <link rel="stylesheet" href="web/telemetry.css">
+  <link rel="stylesheet" href="web/weather.css">
   <script src="web/seed.js" defer></script>
   <script src="web/core.js" defer></script>
   <script src="web/instruments.js" defer></script>
   <script src="web/instrument-view.js" defer></script>
   <script src="web/telemetry.js" defer></script>
   <script src="web/telemetry-view.js" defer></script>
+  <script src="web/weather.js" defer></script>
+  <script src="web/weather-view.js" defer></script>
+  <script src="web/live-signal.js" defer></script>
+  <script src="web/unified-view.js" defer></script>
   <script src="web/app.js" defer></script>
 </head>
 <body>
@@ -65,6 +70,26 @@
           <div class="expanded-only"><span>TO NEXT MILLION</span><strong id="nextMillionEta">—</strong></div>
         </div>
       </section>
+      <div id="weatherMount" class="weather-strip"></div>
+      <section id="unifiedPanel" class="unified-panel" aria-label="Unified live-data observatory">
+        <div class="unified-stage">
+          <canvas id="unifiedCanvas" role="img" aria-label="A unified field combining timestamped solar-wind readings, population signed distance and local temperature"></canvas>
+          <button id="unifiedTareButton" class="micro-button unified-tare" title="Zero the population reference in the shared field">ZERO</button>
+          <div class="unified-readings" aria-label="Statistics calculated from the received solar-wind samples">
+            <div><span>DC · km/s</span><strong id="unifiedDC">—</strong></div>
+            <div><span>AC RMS · km/s</span><strong id="unifiedAC">—</strong></div>
+            <div><span>FFT PEAK · mHz</span><strong id="unifiedHz">—</strong></div>
+          </div>
+        </div>
+        <button id="unifiedSource" class="unified-source" title="Open data sources and model definitions">Waiting for source timestamps…</button>
+        <p id="unifiedChannels" class="unified-legend expanded-only">Waiting for NOAA channel values.</p>
+        <p id="unifiedDistance" class="sr-only">φ = n − P(t) · relative strain</p>
+        <p id="unifiedReference" class="unified-distance expanded-only">Population reference loading.</p>
+        <p id="unifiedWindow" class="unified-window expanded-only">Waiting for a contiguous sample window.</p>
+        <p id="unifiedLegend" class="unified-legend expanded-only">Dots: NOAA history · cyan: wind AC · amber: FFT · violet: Bz · contours: population distance · glow: IJburg temperature · sweep: display phase.</p>
+      </section>
+      <details id="expertPanel" class="expert-panel">
+        <summary>Instrument definitions &amp; controls</summary>
       <section class="strain-section" aria-label="Population signed distance and relative strain">
         <div class="section-heading"><span>01 / SIGNED DISTANCE FIELD</span><button class="micro-button" id="tareButton" title="Lock a new population reference and return the probe to zero">ZERO / TARE</button></div>
         <div class="strain-readout"><div><span class="metric-label">φ = n − P(t)</span><strong id="distanceValue">+0.0 <small>people</small></strong></div><div class="strain-ppm"><span class="metric-label">RELATIVE GROWTH · ΔP/P₀</span><strong id="strainValue">+0.000 <small>ppm</small></strong></div></div>
@@ -109,6 +134,7 @@
         <p class="instrument-note">An editable thought experiment. No real global circuit, measured electricity use, or harvestable energy is implied. Joules accrue only while the focus or break timer runs.</p>
         <button id="energySettingsButton" class="secondary-button full-width">Edit energy assumptions</button>
       </section>
+      </details>
       <section class="pomodoro-section" aria-label="Pomodoro timer">
         <div class="timer-heading"><span id="phaseLabel">FOCUS</span><span class="timer-status" id="timerStatus">Ready</span></div>
         <div class="mode-tabs" role="group" aria-label="Timer mode">
@@ -161,13 +187,13 @@
     <section class="drawer" id="aboutPanel" aria-labelledby="aboutTitle" hidden>
       <div class="drawer-heading"><div><p class="eyebrow">UNDER THE SURFACE</p><h2 id="aboutTitle">Models, with the maths visible.</h2></div><button class="icon-button drawer-close" aria-label="Close model notes"><svg><use href="#i-close"/></svg></button></div>
       <div class="model-notes">
-        <h3>01 / Population & census</h3><p>The count is a continuously interpolated <b>U.S. Census Bureau world estimate</b>, not a real-time enumeration. It can differ from UN estimates. Network refreshes do not count individual births or deaths.</p>
+        <h3>Unified live view</h3><p>The default field combines timestamped public data with explicit visual mappings. NOAA spacecraft observations supply the solar-wind and magnetic histories. DC is the mean wind speed; AC RMS is the root-mean-square fluctuation around that mean. The Fourier peak uses consecutive one-minute samples and is labeled in <b>millihertz (mHz)</b>. Bayer dots encode the received history, the population model drives the signed-distance contour, IJburg model temperature sets the glow, and a display-phase sweep marks time. The sweep is not a radar measurement.</p><p>Automatic refresh: NOAA every 5 minutes, IJburg weather every 15 minutes, and Census every 6 hours when enabled. Observation timestamps remain attached to the readings; missing data is not replaced with simulated observations.</p><p><a href="https://github.com/TomKlootwijk/ZERO-Population-Pomodoro/blob/main/docs/LIVE.md" target="_blank" rel="noopener noreferrer">Live instrument definitions ↗</a></p><p>The collapsed <b>Instrument definitions &amp; controls</b> section contains the optional synthetic waveform, virtual FMCW radar, and hypothetical energy studies. Those models remain separate from the measured wind statistics used by the default field.</p><h3>01 / Population & census</h3><p>The count is a continuously interpolated <b>U.S. Census Bureau world estimate</b>, not a real-time enumeration. It can differ from UN estimates. Network refreshes do not count individual births or deaths.</p>
         <div class="source-detail" id="sourceDetail">Loading source details…</div>
         <div class="source-actions"><button id="refreshButton" class="secondary-button">Refresh feed</button><button id="importButton" class="secondary-button">Import JSON</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
         <p class="field-note" id="networkMessage">A bundled 14 Sep 2026 snapshot keeps the estimate running offline.</p>
         <h3>02 / Signed distance & relative strain</h3><p><code>φ(n,t) = n − P(t)<br>n = P₀ + probe offset<br>relative strain = (P(t) − P₀) / P₀ × 10⁶ ppm</code></p><p>The gauge is a one-dimensional signed distance in people, centered on the estimated total P(t). Tare locks a reference P₀, so an unchanged probe drifts negative as population grows. Strain is a mathematical relative change, not measured physical strain. The signed field is not a geographic or three-dimensional surface.</p><p><code>x = 2 × relative strain<br>Vout / Vex = −x / (4 + 2x) · Vex = 5 V</code></p><p>A virtual quarter bridge maps that relative change to an illustrative voltage, with gauge factor 2 and an R4-arm sign convention. No strain sensor is connected. Tare is a local reference only; changing the source can shift the gauge.</p><h3>03 / Oscilloscope & spectrum</h3><p>A seeded spectrum is inverse-transformed into illustrative population deviations. One 16-second cycle repeats. The multimeter computes the mean, AC RMS, and peak-to-peak of the four-second sample window. DC coupling includes φ; AC coupling subtracts the sample mean. The real 512-point FFT uses a Hann window with coherent-gain correction at 128 samples per second. <b>No demographic variability, EEG, or electrical signal is measured.</b></p><h3>04 / Virtual FMCW radar</h3><p><code>delay = 2R/c · S = bandwidth / chirp time<br>Doppler = 2v/λ<br>beat = S × delay − Doppler</code></p><p>A single ideal target with no noise or multipath. Positive velocity approaches. Tx and Rx show normalized instantaneous chirp frequency; IF is a computed beat waveform. Range and speed are independent of world population. A single up-chirp has range–Doppler coupling; the beat alone cannot independently determine both. The simulation uses no transmitting or receiving hardware.</p>
         <h3>05 / Earth & space</h3><p>Solar-wind and magnetic readings come from NOAA SWPC upstream spacecraft feeds. Observation timestamps, freshness, and data alignment stay visible in the Earth / Space panel. An 8 × 8 Bayer matrix turns each received value into an ordered dot density. The scanning line is decorative; the dots change only when observations update. These readings do not imply a relationship with population.</p><h3>06 / Joules, watts & amperes</h3><p><code>W(t) = P(t) × w/person</code><br><code>I(t) = W(t) / V</code><br><code>E = ∫ W(t) dt</code></p><p>Session joules integrate the model only while the current timer is running, capped at its deadline. Pauses add nothing. The initial <b>100 W/person</b> and <b>230 V</b> are editable illustrative assumptions, not measured physiology, electricity consumption, or harvestable human energy.</p>
-        <h3>Sources & transparency</h3><p class="source-links"><a href="https://www.census.gov/popclock/world" target="_blank" rel="noopener noreferrer">Census world clock ↗</a><a href="https://www.census.gov/popclock/data/population.php/world" target="_blank" rel="noopener noreferrer">Official JSON feed ↗</a><a href="https://www.nist.gov/pml/owm/si-units-electric-current" target="_blank" rel="noopener noreferrer">NIST electrical units ↗</a><a href="https://www.spaceweather.gov/products/solar-wind" target="_blank" rel="noopener noreferrer">NOAA solar wind ↗</a></p><p>No telemetry, ads, accounts, microphone, EEG input, or personal population data. Only public Census and NOAA SWPC feeds are contacted automatically when their refresh options are enabled.</p>
+        <h3>Sources & transparency</h3><p class="source-links"><a href="https://www.census.gov/popclock/world" target="_blank" rel="noopener noreferrer">Census world clock ↗</a><a href="https://www.census.gov/popclock/data/population.php/world" target="_blank" rel="noopener noreferrer">Official JSON feed ↗</a><a href="https://www.nist.gov/pml/owm/si-units-electric-current" target="_blank" rel="noopener noreferrer">NIST electrical units ↗</a><a href="https://www.spaceweather.gov/products/solar-wind" target="_blank" rel="noopener noreferrer">NOAA solar wind ↗</a></p><p>No telemetry, ads, accounts, microphone, EEG input, or personal population data. Only public Census, NOAA SWPC, and Open-Meteo feeds are contacted automatically for their enabled instruments. Weather uses a fixed IJburg-area coordinate, not your device location.</p>
         <button id="exportButton" class="secondary-button full-width">Export current model snapshot</button>
         <p class="field-note">Space: start/pause · R: reset · N: next · M: compact · S: settings · Esc: close panel. Resets and skipped intervals do not count as completed focuses.</p>
       </div>

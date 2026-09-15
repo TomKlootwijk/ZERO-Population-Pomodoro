@@ -36,13 +36,13 @@ async function main() {
   await fs.unlink(path.join(output, 'resources/default_app.asar')).catch(error => { if (error.code !== 'ENOENT') throw error; });
   const appRoot = path.join(output, 'resources/app');
   await fs.mkdir(appRoot, { recursive: true });
-  for (const name of ['index.html', 'web', 'desktop', 'data', 'build', 'LICENSE']) {
+  for (const name of ['index.html', 'web', 'desktop', 'data', 'build', 'LICENSE', 'AUTHORS.md']) {
     await fs.cp(path.join(ROOT, name), path.join(appRoot, name), { recursive: true });
   }
   const pkg = JSON.parse(await fs.readFile(path.join(ROOT, 'package.json'), 'utf8'));
   await fs.writeFile(path.join(appRoot, 'package.json'), JSON.stringify({
     name: pkg.name, productName: 'ZERO', version: pkg.version,
-    description: pkg.description, main: pkg.main, license: pkg.license
+    description: pkg.description, main: pkg.main, license: pkg.license, author: pkg.author
   }, null, 2) + '\n');
   const { rcedit } = await import('rcedit');
   await rcedit(exe, {

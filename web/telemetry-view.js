@@ -72,7 +72,7 @@
       data=T.validateSnapshot(result); cached=false; failure='';
       try{localStorage.setItem(KEY,JSON.stringify(data));}catch(_){}
     }catch(error){cached=!!(data.wind?.length||data.mag?.length);failure=`Feed unavailable. ${cached?'Showing saved readings with their original timestamps.':'No substitute observations are generated.'}`;}
-    finally{busy=false;$('noaaRefresh').disabled=false;render();draw();}
+    finally{busy=false;$('noaaRefresh').disabled=false;render();draw();widget.dispatchEvent(new CustomEvent('zero-telemetry',{bubbles:true,detail:data}));}
   }
   let frozenPhase=0;
   function draw() {
@@ -107,5 +107,6 @@
   new ResizeObserver(draw).observe(mount);
   setInterval(()=>{if(!mount.ownerDocument.hidden){render();draw();}},200);
   setInterval(()=>refresh(),300000);
+  window.ZeroTelemetryLive=Object.freeze({getSnapshot:()=>data,getState:()=>({cached,busy,failure}),refresh:()=>refresh(true)});
   render();setTimeout(()=>refresh(),600);
 })();

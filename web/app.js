@@ -129,6 +129,7 @@
     settle(now);
     const pop = C.populationAt(model, now);
     instruments.render(model, now);
+    window.ZeroUnifiedView?.updatePopulation(instruments.snapshot());
     const number = countFormat.format(Math.floor(pop.value));
     if ($('population').textContent !== number) $('population').textContent = number;
     $('growth').textContent = `${pop.rate >= 0 ? '+' : '−'}${Math.abs(pop.rate).toFixed(2)} people / sec`;
@@ -303,6 +304,9 @@
   $('settingsButton').addEventListener('click', () => openDrawer('settings'));
   $('energySettingsButton').addEventListener('click', () => openDrawer('settings'));
   $('sourceButton').addEventListener('click', () => openDrawer('about'));
+  $('unifiedSource').addEventListener('click', () => openDrawer('about'));
+  $('unifiedTareButton').addEventListener('click', () => $('tareButton').click());
+  $('expertPanel').addEventListener('toggle', () => { lastDraw = -Infinity; requestNativeSize(); });
   $('aboutButton').addEventListener('click', () => openDrawer('about'));
   for (const el of document.querySelectorAll('.drawer-close')) el.addEventListener('click', closeDrawers);
   $('freezeButton').addEventListener('click', () => { setMotion(!settings.motion); persist(); });
@@ -359,10 +363,13 @@
     if (!window.documentPictureInPicture) { toast('For always-on-top mode, run the desktop version. Browser float requires a supported Chromium browser on localhost.'); return; }
     try {
       closeDrawers();
-      pipWindow = await window.documentPictureInPicture.requestWindow({ width: settings.compact ? 360 : 560, height: Math.ceil(widget.getBoundingClientRect().height) });
+      pipWindow = await window.documentPictureInPicture.requestWindow({ width: settings.compact ? 280 : 560, height: Math.ceil(widget.getBoundingClientRect().height) });
       pipWindow.document.title = document.title; pipWindow.document.documentElement.lang = 'en';
-      const link = pipWindow.document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('web/style.css', location.href).href;
-      pipWindow.document.head.appendChild(link); pipWindow.document.body.className = 'pip'; dockBrowser();
+      for (const source of document.querySelectorAll('link[rel="stylesheet"]')) {
+        const link = pipWindow.document.createElement('link'); link.rel = 'stylesheet'; link.href = source.href;
+        pipWindow.document.head.appendChild(link);
+      }
+      pipWindow.document.body.className = 'pip'; dockBrowser();
       activeDocument = pipWindow.document;
       pipWindow.document.body.appendChild(widget); pipWindow.addEventListener('keydown', keyboard);
       pipWindow.addEventListener('resize', () => { lastDraw = -Infinity; });

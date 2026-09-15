@@ -38,7 +38,12 @@ async function main() {
     const compact = await page.locator('#widget').boundingBox();
     console.log('Compact bounds:', compact);
     await page.screenshot({ path: path.join(shots, 'compact.png') });
-    check('compact population observatory fits 360 by 410 pixels', compact.width <= 360 && compact.height <= 410);
+    check('compact observatory fits 280 by 300 pixels', compact.width <= 280 && compact.height <= 300);
+    check('compact view includes IJburg temperature', await page.locator('#localTemperature').isVisible() && (await page.locator('#weatherLocation').innerText()).includes('IJburg'));
+    check('one unified canvas and real wind units lead the compact instruments', await page.locator('#unifiedCanvas').isVisible() && (await page.locator('.unified-readings').innerText()).includes('mHz') && !await page.locator('#waveform').isVisible());
+    await page.locator('#weatherToggle').click();
+    check('weather details disclose model temperature and its source time', (await page.locator('#weatherDetails').innerText()).includes('2 m above ground') && await page.locator('#weatherTimestamp').isVisible());
+    await page.locator('#weatherClose').click();
     check('population leads the display and keeps a secondary timer', (await page.locator('#population').boundingBox()).y < (await page.locator('#timer').boundingBox()).y);
     const initialPopulation = await page.locator('#population').innerText();
     await page.waitForTimeout(1100);
@@ -66,8 +71,9 @@ async function main() {
     await page.locator('#compactButton').click();
     await page.waitForTimeout(500);
     const expanded = await page.locator('#widget').boundingBox();
-    check('expanded lab resizes to 560px and exposes Fourier spectrum', expanded.width === 560 && expanded.height <= 760 && await page.locator('#spectrum').isVisible());
+    check('expanded view keeps the unified field and collapsed model controls', expanded.width === 560 && expanded.height <= 760 && await page.locator('#unifiedCanvas').isVisible() && !await page.locator('#expertPanel').getAttribute('open'));
     await page.screenshot({ path: path.join(shots, 'expanded.png') });
+    await page.locator('#expertPanel > summary').click();
     await page.locator('#probeInput').evaluate(el => {el.value='-200';el.dispatchEvent(new Event('input',{bubbles:true}));});
     check('signed distance places a below-population probe on the negative side', (await page.locator('#distanceValue').innerText()).includes('−'));
     await page.locator('#tareButton').click();

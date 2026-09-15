@@ -16,7 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 FEED = "https://www.census.gov/popclock/data/population.php/world"
-ALLOWED = {"/index.html", "/web/style.css", "/web/app.js", "/web/core.js", "/web/instruments.js", "/web/instrument-view.js", "/web/telemetry.js", "/web/telemetry-view.js", "/web/telemetry.css", "/web/seed.js", "/web/icon.svg", "/data/census-world.json"}
+ALLOWED = {"/index.html", "/web/style.css", "/web/app.js", "/web/core.js", "/web/instruments.js", "/web/instrument-view.js", "/web/telemetry.js", "/web/telemetry-view.js", "/web/telemetry.css", "/web/weather.js", "/web/weather-view.js", "/web/weather.css", "/web/live-signal.js", "/web/unified-view.js", "/web/seed.js", "/web/icon.svg", "/data/census-world.json"}
 LIMIT = 1_000_000
 CACHE_SECONDS = 6 * 60 * 60
 _cache: tuple[float, bytes] | None = None

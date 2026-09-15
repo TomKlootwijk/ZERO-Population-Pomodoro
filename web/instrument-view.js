@@ -60,7 +60,7 @@
         instrument: ['signal', 'radar', 'energy', 'telemetry'].includes(saved && saved.instrument) ? saved.instrument : 'signal'
       };
       if (!saved) state.velocityMps = 1.5;
-      let metrics = null, distance = 0, lastModel = null, latestTime = Date.now(), lastStats = null;
+      let metrics = null, distance = 0, lastModel = null, latestTime = Date.now(), lastStats = null, lastBridgeUv = null;
       const save = () => { try { localStorage.setItem(key, JSON.stringify(state)); } catch (_) { /* Browser may disable storage. */ } };
       const set = (id, text) => { const el = $(id); if (el && el.textContent !== text) el.textContent = text; };
       const selectInstrument = (value, focus = false) => {
@@ -72,8 +72,7 @@
           panel.hidden = !active;
           if (active && focus) button.focus();
         }
-        // The pocket always has a miniature AC trace, independent of the lab tab.
-        if (widget.classList.contains('compact')) $('signalPanel').hidden = false;
+        // Lab selection persists while the pocket hides the full instrument panels.
         widget.dispatchEvent(new CustomEvent('zero-instrument', { bubbles: true, detail: { instrument: value } }));
         changed(); save();
       };
@@ -151,6 +150,7 @@
         set('probeOutput', `${signed(state.offset, 0)} people`);
         // A drastically different imported source can exceed a bridge's physical domain.
         const bridge = I.quarterBridge && metrics.strainPPM > -500000 ? I.quarterBridge(metrics.strainPPM / 1e6) : null;
+        lastBridgeUv = bridge ? bridge.outputUv : null;
         const bridgeNote = bridge ? ` · virtual bridge ${signed(bridge.outputUv, 3)} µV (GF 2 / 5 V)` : ' · outside virtual bridge range';
         const elapsed = Math.max(0, now - state.referenceTime) / 1000;
         const since = elapsed < 60 ? `${Math.floor(elapsed)}s` : duration(elapsed);
@@ -224,14 +224,14 @@
       coupling(state.coupling);
       return {
         render,
-        draw(trace, time) { drawGauge(); if (widget.classList.contains('compact') || state.instrument === 'signal') drawSignal(trace, time); drawRadar(time); },
+        draw(trace, time) { if (!$('expertPanel').open) return; drawGauge(); if (!widget.classList.contains('compact') && state.instrument === 'signal') drawSignal(trace, time); drawRadar(time); },
         layout() { selectInstrument(state.instrument); },
         motion(value) {
           set('radarFreezeButton', value ? 'Freeze signal' : 'Resume signal');
           $('radarFreezeButton').setAttribute('aria-pressed', String(!value));
           widget.dispatchEvent(new CustomEvent('zero-motion', { bubbles: true, detail: { motion: value } }));
         },
-        snapshot() { return { ...state, metrics, signedDistancePeople: distance, sampledAt: latestTime, multimeter: lastStats ? { dc: lastStats.dc, acRms: lastStats.acRms, peakPeak: lastStats.peakPeak, dominantHz: lastStats.dominantHz, units: 'illustrative people' } : null }; }
+        snapshot() { return { ...state, metrics, population: metrics?.population ?? null, rate: metrics?.rate ?? null, delta: metrics?.delta ?? null, strainPPM: metrics?.strainPPM ?? null, distance, bridgeUv: lastBridgeUv, currentTime: latestTime, signedDistancePeople: distance, sampledAt: latestTime, multimeter: lastStats ? { dc: lastStats.dc, acRms: lastStats.acRms, peakPeak: lastStats.peakPeak, dominantHz: lastStats.dominantHz, units: 'illustrative people' } : null }; }
       };
     }
   };

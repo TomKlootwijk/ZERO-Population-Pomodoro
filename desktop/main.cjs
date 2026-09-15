@@ -8,6 +8,7 @@ const https = require('node:https');
 const { parseFeed } = require('../web/core.js');
 const { fitBounds, isDocked } = require('./window-bounds.cjs');
 const { fetchSpaceWeather } = require('./space-weather.cjs');
+const { fetchWeather } = require('./weather.cjs');
 const ROOT = path.resolve(__dirname, '..');
 const FEED = 'https://www.census.gov/popclock/data/population.php/world';
 const ENTRY = 'zero://app/index.html';
@@ -17,13 +18,18 @@ const ASSETS = new Map([
   ['/web/instruments.js', 'text/javascript; charset=utf-8'], ['/web/instrument-view.js', 'text/javascript; charset=utf-8'],
   ['/web/telemetry.js', 'text/javascript; charset=utf-8'], ['/web/telemetry-view.js', 'text/javascript; charset=utf-8'],
   ['/web/telemetry.css', 'text/css; charset=utf-8'],
+  ['/web/weather.js', 'text/javascript; charset=utf-8'], ['/web/weather-view.js', 'text/javascript; charset=utf-8'],
+  ['/web/weather.css', 'text/css; charset=utf-8'],
+  ['/web/live-signal.js', 'text/javascript; charset=utf-8'], ['/web/unified-view.js', 'text/javascript; charset=utf-8'],
   ['/web/seed.js', 'text/javascript; charset=utf-8'], ['/web/icon.svg', 'image/svg+xml']
 ]);
 const EXTERNAL = new Set([
   'https://www.census.gov/popclock/world', FEED,
   'https://www.nist.gov/pml/owm/si-units-electric-current',
   'https://www.spaceweather.gov/products/solar-wind',
+  'https://open-meteo.com/', 'https://creativecommons.org/licenses/by/4.0/',
   'https://github.com/TomKlootwijk/ZERO-Population-Pomodoro',
+  'https://github.com/TomKlootwijk/ZERO-Population-Pomodoro/blob/main/docs/LIVE.md',
   'https://github.com/TomKlootwijk/ZERO-Population-Pomodoro/tree/main/references'
 ]);
 protocol.registerSchemesAsPrivileged([{ scheme: 'zero', privileges: { standard: true, secure: true, supportFetchAPI: true } }]);
@@ -74,7 +80,7 @@ function launchAtLogin() {
   if (!app.isPackaged || !['win32', 'darwin'].includes(process.platform)) return false;
   try {
     const actual = app.getLoginItemSettings(loginOptions());
-    return actual.openAtLogin && (process.platform !== 'win32' || actual.executableWillLaunchAtLogin !== false);
+    return process.platform === 'win32' ? actual.executableWillLaunchAtLogin === true : actual.openAtLogin;
   } catch (_) { return false; }
 }
 function desktopState() {
@@ -253,6 +259,7 @@ else {
     session.defaultSession.setPermissionCheckHandler(() => false);
     ipcMain.handle('zero:population', event => { trusted(event); return fetchPopulation(); });
     ipcMain.handle('zero:space-weather', event => { trusted(event); return fetchSpaceWeather(); });
+    ipcMain.handle('zero:weather', event => { trusted(event); return fetchWeather(); });
     ipcMain.handle('zero:state', event => { trusted(event); return desktopState(); });
     ipcMain.handle('zero:pin', (event, enabled) => {
       trusted(event); if (typeof enabled !== 'boolean') throw new Error('Expected boolean.');
