@@ -138,6 +138,9 @@ copying a portable build. Development builds are unsigned.
 
 ## License
 
+Author: **[Tom Klootwijk](AUTHORS.md)**. The author record includes the identity
+and address details supplied for publication.
+
 Original application code is [MIT licensed](LICENSE). Census source data and
 bundled third-party runtimes retain their own attribution and licenses.
 
